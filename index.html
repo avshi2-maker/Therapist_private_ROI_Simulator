@@ -3,744 +3,1139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MERIDIAN — סימולטור ROI פרטי</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Heebo:wght@300;400;600;700;900&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<title>☯ MERIDIAN — ROI Pricing Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Heebo:wght@300;400;600;700;900&family=Abril+Fatface&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════════════════════════════════════════════
+   MERIDIAN — PRIVATE ROI PRICING INTELLIGENCE TOOL
+   meridian_roi_tool_26022026.html
+   Dark professional · Data-heavy · Owner's eyes only
+═══════════════════════════════════════════════════════ */
 :root {
-  --ink:    #0b1f12;
-  --green:  #0d3320;
-  --green2: #1a5c35;
-  --green3: #2d7a4f;
+  --bg:     #0a0f0a;
+  --bg2:    #0f160f;
+  --bg3:    #141e14;
+  --jade:   #0d5c45;
+  --jade2:  #1a8a65;
+  --jade3:  #2db882;
   --gold:   #c9a84c;
   --gold2:  #e8c96e;
-  --cream:  #faf6ed;
-  --paper:  #f0e8d0;
-  --border: rgba(201,168,76,0.25);
-  --card:   rgba(255,255,255,0.92);
+  --gold3:  #f5e4a0;
+  --cream:  #f0ece0;
+  --red:    #e74c3c;
+  --red2:   #c0392b;
+  --green:  #27ae60;
+  --green2: #2ecc71;
+  --amber:  #f39c12;
+  --muted:  rgba(240,236,224,0.45);
+  --border: rgba(201,168,76,0.15);
+  --card:   rgba(255,255,255,0.04);
+  --card2:  rgba(255,255,255,0.07);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{min-height:100vh;direction:rtl;font-family:'Heebo',sans-serif;}
-body{background:#e8f5e9;color:#1a2e1a;overflow-x:hidden;}
-body::before{
-  content:'';position:fixed;inset:0;z-index:0;
-  background:radial-gradient(ellipse 70% 50% at 20% 20%,rgba(200,230,200,0.8) 0%,transparent 60%),
-    radial-gradient(ellipse 60% 60% at 80% 80%,rgba(201,168,76,0.1) 0%,transparent 50%),
-    linear-gradient(160deg,#e8f5e9 0%,#d4edda 50%,#e0f0e3 100%);
-  pointer-events:none;
-}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--cream);font-family:'Heebo',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 40% at 50% 0%,rgba(13,92,69,0.12),transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 80%,rgba(201,168,76,0.06),transparent 50%);}
 
-/* ══ GATE ══ */
-#gateWrap{
-  position:fixed;inset:0;z-index:1000;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:radial-gradient(ellipse 80% 80% at 50% 50%,#e8f5e9,#d0ead2);
-  padding:24px;
-}
-.gate-safe{
-  width:100%;max-width:380px;
-  background:rgba(255,255,255,0.9);
-  border:1px solid rgba(120,90,20,0.3);
-  border-radius:24px;padding:40px 36px;text-align:center;
-  backdrop-filter:blur(12px);
-  box-shadow:0 8px 40px rgba(0,0,0,0.15),0 0 0 1px rgba(201,168,76,0.1);
-  animation:fadeUp 0.6s ease both;
-}
-.safe-icon{font-size:52px;display:block;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(201,168,76,0.4));}
-.gate-title{font-family:'Cinzel',serif;font-size:14px;letter-spacing:4px;color:#7a5520;margin-bottom:6px;}
-.gate-sub{font-size:12px;color:rgba(42,60,42,0.55);margin-bottom:28px;letter-spacing:1px;}
-.gate-input{
-  width:100%;padding:14px 18px;
-  background:rgba(255,255,255,0.9);
-  border:1px solid rgba(120,90,20,0.3);border-radius:12px;
-  color:#1a2e1a;font-family:'Heebo',sans-serif;font-size:20px;
-  text-align:center;letter-spacing:8px;outline:none;direction:ltr;
-  margin-bottom:8px;transition:border-color .2s,box-shadow .2s;
-}
-.gate-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.12);}
-.gate-hint{font-size:11px;color:rgba(42,60,42,0.6);margin-bottom:20px;min-height:16px;line-height:1.6;}
-.gate-btn{
-  width:100%;padding:14px;
-  background:linear-gradient(135deg,var(--green2),var(--green3));
-  color:var(--gold2);border:none;border-radius:12px;
-  font-family:'Cinzel',serif;font-size:13px;font-weight:600;letter-spacing:2px;
-  cursor:pointer;transition:all .25s;
-}
-.gate-btn:hover{box-shadow:0 8px 24px rgba(13,92,50,0.5);transform:translateY(-1px);}
-.gate-err{color:#ef4444;font-size:12px;margin-top:12px;min-height:18px;}
-.gate-privacy{margin-top:20px;font-size:10px;color:rgba(42,60,42,0.65);line-height:1.7;letter-spacing:.5px;}
-.gate-reset{margin-top:12px;font-size:10px;color:rgba(180,30,30,0.7);cursor:pointer;text-decoration:underline;}
-.gate-reset:hover{color:rgba(239,68,68,0.6);}
-
-/* ══ APP ══ */
-#appWrap{position:relative;z-index:1;min-height:100vh;padding:0 0 60px;}
-.topbar{
-  background:rgba(255,255,255,0.88);
-  border-bottom:1px solid rgba(201,168,76,0.35);
-  padding:12px 24px;
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,15,10,0.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:14px 28px;
   display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);
 }
-.tb-brand{font-family:'Cinzel',serif;font-size:13px;letter-spacing:4px;color:#7a5520;}
-.tb-brand-sub{font-size:9px;color:rgba(90,60,20,0.55);letter-spacing:2px;margin-top:2px;}
-.tb-actions{display:flex;gap:8px;}
-.tb-btn{
-  padding:7px 14px;border:1px solid rgba(120,90,20,0.3);border-radius:8px;
-  background:rgba(13,92,50,0.08);color:#5a3d08;
-  font-family:'Heebo',sans-serif;font-size:11px;font-weight:700;
-  cursor:pointer;transition:all .2s;letter-spacing:.5px;
-}
-.tb-btn:hover{background:rgba(201,168,76,0.12);border-color:var(--gold);}
-.tb-btn.red{color:#c0392b;border-color:rgba(192,57,43,0.3);}
-.tb-btn.red:hover{background:rgba(248,113,113,0.1);border-color:#f87171;}
+.h-brand{font-family:'Cinzel',serif;font-size:13px;letter-spacing:4px;color:var(--gold);}
+.h-badge{font-size:9px;letter-spacing:3px;color:var(--jade3);background:rgba(45,184,130,0.1);
+  border:1px solid rgba(45,184,130,0.25);border-radius:4px;padding:3px 10px;text-transform:uppercase;}
+.h-right{display:flex;align-items:center;gap:14px;}
+.h-save{font-size:10px;color:var(--muted);cursor:pointer;letter-spacing:.5px;transition:color .2s;}
+.h-save:hover{color:var(--gold);}
 
-/* MAIN */
-.main{max-width:1050px;margin:0 auto;padding:28px 20px;}
+/* ── LAYOUT ── */
+.main{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:28px 20px 80px;}
 
-/* MONTH BAR */
-.month-bar{
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-  margin-bottom:28px;animation:fadeUp .5s .1s ease both;
+/* ── SECTION TITLES ── */
+.sec-title{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;
+  color:var(--gold);text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
 }
-.month-lbl{font-size:10px;color:rgba(30,50,30,0.85);letter-spacing:2px;text-transform:uppercase;font-weight:600;}
-.month-sel{
-  padding:8px 14px;background:rgba(255,255,255,0.7);
-  border:1px solid rgba(120,90,20,0.3);border-radius:10px;
-  color:#1a2e1a;font-family:'Heebo',sans-serif;font-size:13px;font-weight:700;outline:none;cursor:pointer;
-}
-.month-note{font-size:10px;color:rgba(30,50,30,0.65);margin-right:auto;letter-spacing:.5px;}
-
-/* DASHBOARD */
-.dashboard{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
-  margin-bottom:32px;animation:fadeUp .5s .15s ease both;
-}
-@media(max-width:600px){.dashboard{grid-template-columns:1fr;}}
-.dash-card{
-  background:rgba(255,255,255,0.75);border:1px solid rgba(120,90,20,0.25);
-  border-radius:16px;padding:20px 22px;text-align:center;
-  position:relative;overflow:hidden;transition:transform .2s;
-}
-.dash-card:hover{transform:translateY(-2px);}
-.dash-card::before{content:'';position:absolute;top:0;right:0;left:0;height:2px;}
-.dash-card.income::before{background:linear-gradient(90deg,var(--green3),var(--gold));}
-.dash-card.expense::before{background:linear-gradient(90deg,#991b1b,#ef4444);}
-.dash-card.profit::before{background:linear-gradient(90deg,var(--gold),var(--gold2));}
-.dash-lbl{font-size:9px;letter-spacing:3px;color:rgba(42,60,42,0.75);margin-bottom:8px;text-transform:uppercase;}
-.dash-val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;line-height:1;margin-bottom:6px;}
-.dash-val.g{color:#1a5c1a;}
-.dash-val.r{color:#c0392b;}
-.dash-val.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.dash-sub{font-size:10px;color:rgba(42,60,42,0.75);}
-.profit-badge{
-  display:inline-block;margin-top:8px;padding:3px 12px;
-  border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;
-}
-.profit-badge.pos{background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.3);}
-.profit-badge.neg{background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3);}
-.profit-badge.zero{background:rgba(201,168,76,0.15);color:var(--gold2);border:1px solid rgba(201,168,76,0.3);}
-
-/* SECTIONS */
-.section{margin-bottom:28px;animation:fadeUp .5s .2s ease both;}
-.section-head{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:14px;padding-bottom:10px;
-  border-bottom:1px solid rgba(201,168,76,0.14);
-}
-.section-title{
-  font-family:'Playfair Display',serif;font-size:18px;font-weight:700;
-  color:#5a3d08;display:flex;align-items:center;gap:10px;
-}
-.section-sum{font-family:'Playfair Display',serif;font-size:15px;color:#7a5520;}
-.add-row-btn{
-  display:flex;align-items:center;gap:6px;
-  padding:7px 14px;background:rgba(13,92,50,0.35);
-  border:1px solid rgba(201,168,76,0.28);border-radius:8px;
-  color:var(--gold2);font-family:'Heebo',sans-serif;font-size:12px;font-weight:700;
-  cursor:pointer;transition:all .2s;
-}
-.add-row-btn:hover{background:rgba(13,92,50,0.65);border-color:var(--gold);}
-
-/* TABLES */
-.ledger{width:100%;border-collapse:collapse;}
-.ledger th{
-  font-size:9px;letter-spacing:2px;color:rgba(42,60,42,0.6);
-  padding:9px 12px;text-align:right;font-weight:600;
-  border-bottom:1px solid rgba(120,90,20,0.15);
-  background:rgba(255,255,255,0.5);
-}
-.ledger td{padding:0;border-bottom:1px solid rgba(0,0,0,0.06);vertical-align:middle;}
-.ledger tr:hover td{background:rgba(13,92,50,0.05);}
-.rn{padding:10px 10px;font-size:11px;color:rgba(42,60,42,0.65);font-weight:700;text-align:center;width:36px;}
-.ci{
-  width:100%;padding:10px 12px;background:transparent;border:none;outline:none;
-  color:#1a2e1a;font-family:'Heebo',sans-serif;font-size:13px;
-  text-align:right;direction:rtl;transition:background .15s;
-}
-.ci:focus{background:rgba(13,92,50,0.08);}
-.ci.num{direction:ltr;text-align:left;font-weight:700;color:#2d5a1a;}
-.ci.tot{color:#1a3d1a;font-weight:700;font-family:'Playfair Display',serif;font-size:14px;pointer-events:none;background:rgba(13,92,50,0.06);}
-.ci.dim{color:rgba(20,40,20,0.65);}
-.del{
-  display:block;margin:auto;width:26px;height:26px;
-  background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.18);
-  border-radius:6px;color:#ef4444;font-size:13px;
-  cursor:pointer;transition:all .2s;text-align:center;line-height:26px;
-  font-family:monospace;
-}
-.del:hover{background:rgba(239,68,68,0.22);border-color:#ef4444;}
-.lock-icon{color:rgba(42,60,42,0.35);font-size:12px;text-align:center;display:block;padding:6px;}
-
-/* BOTTOM LINE */
-.bottomline{
-  background:rgba(255,255,255,0.75);
-  border:1px solid rgba(120,90,20,0.25);
-  border-radius:16px;padding:24px 28px;
-  margin-top:32px;animation:fadeUp .5s .35s ease both;
-}
-.bl-head{
-  font-family:'Playfair Display',serif;font-size:17px;color:#7a5520;
-  margin-bottom:20px;display:flex;align-items:center;gap:10px;
-  padding-bottom:12px;border-bottom:1px solid rgba(120,90,20,0.15);
-}
-.bl-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.06);
-}
-.bl-row:last-child{border-bottom:none;}
-.bl-row.grand{
-  margin-top:8px;padding-top:16px;
-  border-top:2px solid rgba(201,168,76,0.25);border-bottom:none;
-}
-.bl-lbl{font-size:13px;color:rgba(42,60,42,0.88);font-weight:500;}
-.bl-val{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;}
-.bl-val.g{color:#1a5c1a;}
-.bl-val.r{color:#c0392b;}
-.bl-val.gold{color:#7a5520;}
-.roi-insight{
-  margin-top:16px;padding:14px 18px;
-  background:rgba(13,92,50,0.07);border:1px solid rgba(13,92,50,0.2);
-  border-radius:10px;font-size:12px;line-height:2;
-  color:rgba(20,40,20,0.85);text-align:center;
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.sec-num{
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel',serif;font-size:10px;color:var(--gold);flex-shrink:0;
 }
 
-/* PRIVACY BOX */
-.privacy-box{
-  margin-top:24px;
-  background:rgba(255,255,255,0.6);border:1px solid rgba(13,92,50,0.3);
-  border-radius:12px;padding:14px 18px;
-  display:flex;gap:12px;align-items:flex-start;
-  animation:fadeUp .5s .45s ease both;
-}
-.privacy-txt{font-size:11px;line-height:1.8;color:rgba(20,40,20,0.82);}
-.privacy-txt strong{color:#1a5c35;}
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:20px;}
+.card-dark{background:rgba(13,92,69,0.08);border:1px solid rgba(13,92,69,0.25);border-radius:14px;padding:20px;}
+.card-gold{background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:14px;padding:20px;}
+.card-red{background:rgba(231,76,60,0.07);border:1px solid rgba(231,76,60,0.2);border-radius:14px;padding:20px;}
 
-/* BACK */
-.back-bar{text-align:center;margin-top:32px;animation:fadeUp .5s .5s ease both;}
-.back-btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 20px;border:1px solid rgba(42,60,42,0.4);border-radius:10px;
-  color:rgba(42,60,42,0.8);font-size:12px;font-weight:700;letter-spacing:1px;
-  cursor:pointer;transition:all .2s;background:none;font-family:'Heebo',sans-serif;
-}
-.back-btn:hover{color:var(--gold);border-color:var(--gold);background:rgba(201,168,76,0.06);}
+/* ── INPUTS ── */
+.input-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.input-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.input-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+@media(max-width:700px){.input-grid-2,.input-grid-3{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.input-grid-2,.input-grid-3{grid-template-columns:1fr;}}
 
-/* TOAST */
-.toast{
-  position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:9999;
-  background:#0d3320;color:var(--gold2);
-  padding:10px 24px;border-radius:10px;
-  font-family:'Heebo',sans-serif;font-size:13px;font-weight:700;
-  border:1px solid rgba(201,168,76,0.35);
-  box-shadow:0 8px 32px rgba(0,0,0,0.4);
-  animation:toastIn .3s ease;pointer-events:none;
+.field{display:flex;flex-direction:column;gap:5px;}
+.flbl{font-size:9px;letter-spacing:1.5px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.finp{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;padding:9px 12px;
+  color:var(--cream);font-family:'JetBrains Mono',monospace;font-size:13px;
+  outline:none;text-align:left;direction:ltr;
+  transition:border-color .2s,background .2s;width:100%;
+}
+.finp:focus{border-color:var(--gold);background:rgba(255,255,255,0.09);}
+.finp.wide{text-align:right;direction:rtl;font-family:'Heebo',sans-serif;}
+.funit{font-size:9px;color:rgba(201,168,76,0.6);margin-top:2px;}
+
+/* ── RANGE SLIDERS ── */
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;
+  height:4px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--gold);cursor:pointer;
+  box-shadow:0 0 6px rgba(201,168,76,0.4);}
+.slider-row{display:flex;align-items:center;gap:10px;}
+.slider-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold2);
+  min-width:52px;text-align:right;}
+
+/* ── RESULTS ── */
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:16px;}
+.result-card{
+  background:var(--card2);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:14px;text-align:center;
+}
+.result-card.profit{border-color:rgba(45,184,130,0.35);background:rgba(45,184,130,0.07);}
+.result-card.loss{border-color:rgba(231,76,60,0.35);background:rgba(231,76,60,0.07);}
+.result-card.warn{border-color:rgba(243,156,18,0.35);background:rgba(243,156,18,0.07);}
+.result-card.gold{border-color:rgba(201,168,76,0.35);background:rgba(201,168,76,0.07);}
+.rc-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+.rc-value{font-family:'Abril Fatface',serif;font-size:26px;line-height:1;}
+.rc-value.green{color:var(--green2);}
+.rc-value.red{color:var(--red);}
+.rc-value.gold{color:var(--gold2);}
+.rc-value.amber{color:var(--amber);}
+.rc-value.jade{color:var(--jade3);}
+.rc-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+
+/* ── BIG NUMBER ── */
+.big-num{font-family:'Abril Fatface',serif;font-size:48px;color:var(--gold2);line-height:1;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap;}
+.tab{
+  padding:8px 18px;border-radius:8px;cursor:pointer;
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;
+  border:1px solid rgba(255,255,255,0.08);color:var(--muted);
+  transition:all .2s;background:rgba(255,255,255,0.03);
+}
+.tab:hover{border-color:rgba(201,168,76,0.3);color:var(--cream);}
+.tab.active{background:rgba(201,168,76,0.12);border-color:var(--gold);color:var(--gold2);}
+
+/* ── PANEL ── */
+.panel{display:none;}
+.panel.active{display:block;animation:fadeUp .3s ease both;}
+
+/* ── PROFIT METER ── */
+.meter-wrap{margin:12px 0;}
+.meter-bar{height:8px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;position:relative;}
+.meter-fill{height:100%;border-radius:4px;transition:width .5s ease,background .5s;}
+.meter-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:4px;}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-size:12px;}
+.data-table th{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold);
+  text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border);text-align:right;}
+.data-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--cream);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(255,255,255,0.03);}
+.data-table .mono{font-family:'JetBrains Mono',monospace;font-size:11px;}
+.data-table .green{color:var(--green2);}
+.data-table .red{color:var(--red);}
+.data-table .gold{color:var(--gold2);}
+.data-table .amber{color:var(--amber);}
+
+/* ── BUTTONS ── */
+.btn{
+  padding:10px 22px;border-radius:9px;cursor:pointer;font-family:'Cinzel',serif;
+  font-size:11px;font-weight:600;letter-spacing:2px;transition:all .25s;border:none;
+}
+.btn-jade{background:linear-gradient(135deg,var(--jade),var(--jade2));color:var(--gold2);
+  box-shadow:0 4px 14px rgba(13,92,69,0.35);}
+.btn-jade:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(13,92,69,0.45);}
+.btn-gold{background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.12));
+  color:var(--gold2);border:1px solid rgba(201,168,76,0.3);}
+.btn-gold:hover{background:rgba(201,168,76,0.2);}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--muted);}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.25);color:var(--cream);}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+
+/* ── OFFER BOX ── */
+.offer-box{
+  background:rgba(13,92,69,0.1);border:1px solid rgba(13,92,69,0.3);
+  border-radius:12px;padding:20px 24px;
+  font-family:'Heebo',sans-serif;font-size:13px;line-height:2.1;
+  color:var(--cream);white-space:pre-wrap;direction:rtl;text-align:right;
+  min-height:80px;
+}
+.offer-box strong{color:var(--gold2);}
+
+/* ── TIER SELECT ── */
+.tier-sel{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;
+}
+.ts-opt{
+  border:1.5px solid rgba(255,255,255,0.08);border-radius:9px;
+  padding:10px 6px;text-align:center;cursor:pointer;
+  transition:all .2s;background:rgba(255,255,255,0.03);
+}
+.ts-opt:hover{border-color:rgba(201,168,76,0.3);}
+.ts-opt.sel{border-color:var(--gold);background:rgba(201,168,76,0.1);}
+.ts-name{font-size:12px;font-weight:700;color:var(--cream);}
+.ts-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold2);margin-top:2px;}
+
+/* ── ADDON CHECKS ── */
+.addon-row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;}
+.addon-chk{
+  display:flex;align-items:center;gap:7px;padding:7px 14px;
+  border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;cursor:pointer;
+  font-size:11px;transition:all .2s;background:rgba(255,255,255,0.03);
+}
+.addon-chk:hover{border-color:rgba(201,168,76,0.3);}
+.addon-chk.on{border-color:var(--jade3);background:rgba(45,184,130,0.08);color:var(--jade3);}
+.addon-chk input{display:none;}
+
+/* ── GROUP THERAPIST LIST ── */
+.grp-list{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+.grp-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:center;}
+@media(max-width:600px){.grp-row{grid-template-columns:1fr 1fr;}}
+.grp-del{width:28px;height:28px;border-radius:6px;border:1px solid rgba(231,76,60,0.3);
+  background:rgba(231,76,60,0.08);color:var(--red);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.grp-del:hover{background:rgba(231,76,60,0.2);}
+
+/* ── WARNING BOX ── */
+.warn-box{
+  background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.25);
+  border-radius:10px;padding:12px 16px;font-size:11px;color:rgba(231,76,60,0.9);
+  line-height:1.8;margin-top:12px;display:none;
+}
+.warn-box.visible{display:block;}
+.info-box{
+  background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);
+  border-radius:10px;padding:12px 16px;font-size:11px;color:rgba(201,168,76,0.85);
+  line-height:1.8;margin-top:12px;
 }
 
-/* PRINT */
-@media print{
-  #gateWrap,.topbar,.tb-actions,.add-row-btn,.del,.back-bar,.privacy-box,.gate-reset{display:none!important;}
-  body{background:white!important;color:#000!important;}
-  .main{padding:0!important;}
-  .dash-val{-webkit-text-fill-color:inherit!important;}
-}
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:24px 0;}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
-@keyframes toastIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
+/* ── SPACER ── */
+.gap{margin-bottom:20px;}
+.gap-sm{margin-bottom:12px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 
-<!-- ══ PASSWORD GATE ══ -->
-<div id="gateWrap">
-  <div class="gate-safe" id="gateSafe">
-    <span class="safe-icon">🔐</span>
-    <div class="gate-title">PRIVATE ROI SIMULATOR</div>
-    <div class="gate-sub" id="gateSub">סימולטור הכנסות פרטי — MERIDIAN</div>
-    <input type="password" id="gateInput" class="gate-input" placeholder="••••••" maxlength="30">
-    <div class="gate-hint" id="gateHint"></div>
-    <button class="gate-btn" id="gateBtn" onclick="gateSubmit()">פתח את הסימולטור ←</button>
-    <div class="gate-err" id="gateErr"></div>
-    <div class="gate-privacy">🔒 כל הנתונים שמורים על המכשיר שלך בלבד<br>לא נשלח דבר לשרת — פרטיות מוחלטת</div>
-    <div class="gate-reset" onclick="resetPassword()">שכחתי סיסמה — אפס והתחל מחדש</div>
+<!-- HEADER -->
+<div class="header">
+  <div class="h-brand">☯ MERIDIAN</div>
+  <div class="h-right">
+    <div class="h-badge">🔒 OWNER ONLY — PRIVATE</div>
+    <div class="h-save" onclick="saveToLocal()">💾 שמור הגדרות</div>
   </div>
 </div>
 
-<!-- ══ MAIN APP ══ -->
-<div id="appWrap" style="display:none;">
-  <div class="topbar">
-    <div>
-      <div class="tb-brand">📒 PRIVATE ROI SIMULATOR</div>
-      <div class="tb-brand-sub">MERIDIAN CLINICAL INTELLIGENCE</div>
+<div class="main">
+
+  <!-- ══════════════════════════════════════════
+       MODULE 0 — COST VARIABLES (always visible)
+  ══════════════════════════════════════════ -->
+  <div class="sec-title"><div class="sec-num">⚙</div>משתני עלות — ערכי בסיס (עדכן כשהספקים משנים מחיר)</div>
+
+  <div class="card gap">
+    <div class="input-grid">
+      <div class="field">
+        <label class="flbl">Claude API — $/ 1M tokens</label>
+        <input class="finp" id="v_claude" type="number" step="0.1" value="3.00">
+        <div class="funit">Anthropic Sonnet — עדכן בלוח הבקרה</div>
+      </div>
+      <div class="field">
+        <label class="flbl">Whisper — $/דקה</label>
+        <input class="finp" id="v_whisper" type="number" step="0.001" value="0.003">
+        <div class="funit">OpenAI gpt-4o-mini-transcribe</div>
+      </div>
+      <div class="field">
+        <label class="flbl">Supabase Pro — $/חודש</label>
+        <input class="finp" id="v_supa" type="number" step="1" value="25.00">
+        <div class="funit">מתחלק בין כל המטפלים</div>
+      </div>
+      <div class="field">
+        <label class="flbl">אחסון אודיו — $/GB/חודש</label>
+        <input class="finp" id="v_storage" type="number" step="0.001" value="0.021">
+        <div class="funit">Supabase Storage rate</div>
+      </div>
+      <div class="field">
+        <label class="flbl">Egress אודיו — $/GB</label>
+        <input class="finp" id="v_egress" type="number" step="0.01" value="0.09">
+        <div class="funit">Supabase CDN delivery</div>
+      </div>
+      <div class="field">
+        <label class="flbl">דקות ממוצע למפגש</label>
+        <input class="finp" id="v_sessmin" type="number" step="5" value="50">
+        <div class="funit">TCM session average</div>
+      </div>
+      <div class="field">
+        <label class="flbl">שאילתות AI למפגש</label>
+        <input class="finp" id="v_queries" type="number" step="1" value="8">
+        <div class="funit">ממוצע קריאות Claude</div>
+      </div>
+      <div class="field">
+        <label class="flbl">טוקנים לשאילתה</label>
+        <input class="finp" id="v_tokens" type="number" step="500" value="2000">
+        <div class="funit">input+output combined avg</div>
+      </div>
+      <div class="field">
+        <label class="flbl">MB לשמע למפגש</label>
+        <input class="finp" id="v_audiomb" type="number" step="1" value="23">
+        <div class="funit">mono MP3 64kbps × session min</div>
+      </div>
+      <div class="field">
+        <label class="flbl">ימי עבודה בחודש</label>
+        <input class="finp" id="v_days" type="number" step="1" value="22">
+        <div class="funit">לחישוב sessions/month</div>
+      </div>
+      <div class="field">
+        <label class="flbl">מספר לקוחות נוכחי</label>
+        <input class="finp" id="v_customers" type="number" step="1" value="20">
+        <div class="funit">לחלוקת עלות Supabase</div>
+      </div>
     </div>
-    <div class="tb-actions">
-      <button class="tb-btn" onclick="printReport()">🖨️ הדפס</button>
-      <button class="tb-btn red" onclick="clearAndReset()">🗑️ מחק והתחל חישוב מחדש</button>
+    <div class="btn-row">
+      <button class="btn btn-jade" onclick="recalcAll()">🔄 חשב הכל מחדש</button>
+      <button class="btn btn-ghost" onclick="resetVars()">↺ ברירת מחדל</button>
     </div>
   </div>
 
-  <div class="main">
+  <!-- ══════════════════════════════════════════
+       TABS
+  ══════════════════════════════════════════ -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('t1',this)">1 · מחשבון מטפל</div>
+    <div class="tab" onclick="switchTab('t2',this)">2 · תרחישי מחיר</div>
+    <div class="tab" onclick="switchTab('t3',this)">3 · הנחת קבוצה</div>
+    <div class="tab" onclick="switchTab('t4',this)">4 · P&amp;L חודשי</div>
+    <div class="tab" onclick="switchTab('t5',this)">5 · מכתב הצעה</div>
+  </div>
 
-    <!-- Month Selector -->
-    <div class="month-bar">
-      <span class="month-lbl">חודש:</span>
-      <select class="month-sel" id="monthSel" onchange="onMonthChange()">
-        <option>ינואר 2026</option><option selected>פברואר 2026</option><option>מרץ 2026</option>
-        <option>אפריל 2026</option><option>מאי 2026</option><option>יוני 2026</option>
-        <option>יולי 2026</option><option>אוגוסט 2026</option><option>ספטמבר 2026</option>
-        <option>אוקטובר 2026</option><option>נובמבר 2026</option><option>דצמבר 2026</option>
-      </select>
-      <span class="month-note">🔒 פרטי — נשמר על המכשיר שלך בלבד</span>
-    </div>
+  <!-- ══════════════════════════════════════════
+       TAB 1 — SINGLE THERAPIST CALCULATOR
+  ══════════════════════════════════════════ -->
+  <div id="t1" class="panel active">
+    <div class="sec-title"><div class="sec-num">1</div>מחשבון מטפל יחיד</div>
 
-    <!-- Income Table -->
-    <div class="section">
-      <div class="section-head">
-        <div class="section-title">💰 הכנסות — מטופלים</div>
-        <button class="add-row-btn" onclick="addPatient()">➕ הוסף מטופל</button>
+    <!-- Tier selector -->
+    <div class="card gap">
+      <div class="flbl" style="margin-bottom:10px;">בחר רמת טוקנים</div>
+      <div class="tier-sel">
+        <div class="ts-opt sel" id="ts1_s" onclick="selTier1('s')">
+          <div class="ts-name">🍅 Starter</div>
+          <div class="ts-price">5 מפגשים/יום</div>
+        </div>
+        <div class="ts-opt" id="ts1_p" onclick="selTier1('p')">
+          <div class="ts-name">🍅 Pro</div>
+          <div class="ts-price">15 מפגשים/יום</div>
+        </div>
+        <div class="ts-opt" id="ts1_u" onclick="selTier1('u')">
+          <div class="ts-name">🍅 Unlimited</div>
+          <div class="ts-price">∞ מפגשים/יום</div>
+        </div>
       </div>
-      <table class="ledger">
-        <thead><tr>
-          <th style="width:36px;text-align:center;">#</th>
-          <th>שם מטופל</th>
-          <th style="width:110px;">מספר טיפולים</th>
-          <th style="width:140px;">תעריף לטיפול ₪</th>
-          <th style="width:130px;">סה"כ ₪</th>
-          <th style="width:36px;"></th>
-        </tr></thead>
-        <tbody id="incTbody"></tbody>
-      </table>
-    </div>
-
-    <!-- Expenses Table -->
-    <div class="section" style="animation-delay:.25s;">
-      <div class="section-head">
-        <div class="section-title">📉 הוצאות קבועות</div>
+      <div class="flbl" style="margin-bottom:8px;">תוספות</div>
+      <div class="addon-row">
+        <label class="addon-chk" id="ac1_audio" onclick="toggleAddon1('audio')">
+          <input type="checkbox" id="a1_audio"> 🎙️ הקלטת אודיו
+        </label>
+        <label class="addon-chk" id="ac1_trans" onclick="toggleAddon1('trans')">
+          <input type="checkbox" id="a1_trans"> 📝 תמלול עברית
+        </label>
       </div>
-      <table class="ledger">
-        <thead><tr>
-          <th style="width:36px;text-align:center;">#</th>
-          <th>סוג הוצאה</th>
-          <th style="width:200px;">סכום חודשי ₪</th>
-          <th style="width:36px;"></th>
-        </tr></thead>
-        <tbody id="expTbody"></tbody>
-      </table>
-    </div>
-
-    <!-- Bottom Line -->
-    <div class="bottomline">
-      <div class="bl-head">📊 סיכום — <span id="blMonth" style="color:rgba(80,60,20,0.7);font-size:13px;"></span></div>
-      <div class="bl-row">
-        <span class="bl-lbl">💰 סך הכנסות ממטופלים</span>
-        <span class="bl-val g" id="blInc">₪0</span>
-      </div>
-      <div class="bl-row">
-        <span class="bl-lbl">📉 סך הוצאות קבועות</span>
-        <span class="bl-val r" id="blExp">₪0</span>
-      </div>
-      <div class="bl-row grand">
-        <span class="bl-lbl" style="font-size:15px;font-weight:700;color:#1a2e1a;">💎 רווח / הפסד חזוי</span>
-        <span class="bl-val gold" id="blProfit" style="font-size:24px;">₪0</span>
-      </div>
-      <div class="roi-insight" id="roiInsight">הזן נתונים בטבלאות למעלה לקבלת הערכת ROI</div>
-    </div>
-
-    <!-- Privacy -->
-    <div class="privacy-box">
-      <span style="font-size:22px;flex-shrink:0;">🛡️</span>
-      <div class="privacy-txt">
-        <strong>פרטיות מוחלטת:</strong> כל הנתונים הכספיים בסימולטור זה נשמרים אך ורק על המכשיר שלך.<br>
-        ❌ <strong>לא נשמרים בקבצי Cookies / Cache</strong> — הנתונים מאוחסנים ב-localStorage בלבד.<br>
-        🗑️ <strong>לחיצה על "מחק והתחל חישוב מחדש" מנקה את הכנסות החודש</strong> — הוצאות קבועות נשמרות לחישוב הבא.<br>
-        MERIDIAN לא שומרת, לא מעבירה, ולא ניגשת לנתוני הכנסות או הוצאות שלך — <strong>הנתונים הם שלך בלבד.</strong>
+      <div class="flbl" style="margin-bottom:5px;">מחירים שאתה גובה (ערוך לבדיקת תרחישים)</div>
+      <div class="input-grid-3">
+        <div class="field">
+          <label class="flbl">מחיר בסיס $</label>
+          <input class="finp" id="p1_base" type="number" value="18.90" onchange="calc1()">
+        </div>
+        <div class="field">
+          <label class="flbl">מחיר טוקנים $</label>
+          <input class="finp" id="p1_tok" type="number" value="9" onchange="calc1()">
+        </div>
+        <div class="field">
+          <label class="flbl">מחיר אודיו $</label>
+          <input class="finp" id="p1_audio" type="number" value="8" onchange="calc1()">
+        </div>
+        <div class="field">
+          <label class="flbl">מחיר תמלול $</label>
+          <input class="finp" id="p1_trans" type="number" value="28" onchange="calc1()">
+        </div>
+        <div class="field">
+          <label class="flbl">הנחה %</label>
+          <div class="slider-row">
+            <input type="range" id="sl1_disc" min="0" max="50" value="0" oninput="document.getElementById('sv1_disc').textContent=this.value+'%';calc1()">
+            <span class="slider-val" id="sv1_disc">0%</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="back-bar">
-      <button class="back-btn" onclick="history.back()">← חזור לעמוד סיום המפגש</button>
+    <!-- Results -->
+    <div class="result-grid" id="res1"></div>
+    <div class="divider"></div>
+    <!-- Cost breakdown table -->
+    <div class="card">
+      <div class="flbl" style="margin-bottom:12px;">פירוט עלויות אמיתיות vs מחיר</div>
+      <table class="data-table" id="tbl1"></table>
+    </div>
+    <div class="warn-box" id="warn1"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 2 — WHAT-IF SCENARIOS
+  ══════════════════════════════════════════ -->
+  <div id="t2" class="panel">
+    <div class="sec-title"><div class="sec-num">2</div>תרחישי מחיר — What If</div>
+    <div class="info-box">
+      💡 שנה כל מחיר ורואה מיד את ההשפעה על הרווח בכל tier. השורות האדומות מראות היכן אתה מפסיד כסף.
+    </div>
+    <div class="gap-sm"></div>
+
+    <div class="card gap">
+      <div class="flbl" style="margin-bottom:12px;">הגדר את המחירים שלך</div>
+      <div class="input-grid">
+        <div class="field"><label class="flbl">בסיס Core $</label><input class="finp" id="w_base" type="number" value="18.90" onchange="calc2()"></div>
+        <div class="field"><label class="flbl">Starter tokens $</label><input class="finp" id="w_ts" type="number" value="9" onchange="calc2()"></div>
+        <div class="field"><label class="flbl">Pro tokens $</label><input class="finp" id="w_tp" type="number" value="25" onchange="calc2()"></div>
+        <div class="field"><label class="flbl">Unlimited tokens $</label><input class="finp" id="w_tu" type="number" value="42" onchange="calc2()"></div>
+        <div class="field"><label class="flbl">Audio add-on $</label><input class="finp" id="w_audio" type="number" value="8" onchange="calc2()"></div>
+        <div class="field"><label class="flbl">Transcription $</label><input class="finp" id="w_trans" type="number" value="28" onchange="calc2()"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flbl" style="margin-bottom:12px;">טבלת רווחיות לפי tier ותוספות</div>
+      <div style="overflow-x:auto;">
+        <table class="data-table" id="tbl2"></table>
+      </div>
+    </div>
+    <div class="gap-sm"></div>
+    <div class="card-gold">
+      <div class="flbl" style="margin-bottom:10px;">הכנסה מקסימלית אפשרית — מטפל שבוחר הכל</div>
+      <div id="maxPackage"></div>
     </div>
   </div>
-</div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 3 — GROUP DISCOUNT
+  ══════════════════════════════════════════ -->
+  <div id="t3" class="panel">
+    <div class="sec-title"><div class="sec-num">3</div>מחשבון הנחת קבוצה</div>
+
+    <div class="card gap">
+      <div class="flbl" style="margin-bottom:10px;">הגדר קבוצת מטפלים</div>
+      <div class="grp-list" id="grpList"></div>
+      <div class="btn-row">
+        <button class="btn btn-jade" onclick="addGroupRow()">➕ הוסף מטפל לקבוצה</button>
+        <button class="btn btn-ghost" onclick="clearGroup()">🗑️ נקה קבוצה</button>
+      </div>
+    </div>
+
+    <div class="card gap">
+      <div class="input-grid-3">
+        <div class="field">
+          <label class="flbl">מרווח רווח מינימלי %</label>
+          <div class="slider-row">
+            <input type="range" id="grp_margin" min="10" max="80" value="50" oninput="document.getElementById('grp_margin_v').textContent=this.value+'%';calc3()">
+            <span class="slider-val" id="grp_margin_v">50%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="flbl">הנחה מבוקשת %</label>
+          <div class="slider-row">
+            <input type="range" id="grp_disc" min="0" max="50" value="15" oninput="document.getElementById('grp_disc_v').textContent=this.value+'%';calc3()">
+            <span class="slider-val" id="grp_disc_v">15%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="flbl">שם הקליניקה/קבוצה</label>
+          <input class="finp wide" id="grp_name" type="text" placeholder="קליניקת שלום..." oninput="calc3()">
+        </div>
+      </div>
+    </div>
+
+    <div class="result-grid" id="res3"></div>
+    <div class="warn-box" id="warn3"></div>
+    <div class="gap-sm"></div>
+    <div class="card" id="grpTable"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 4 — MONTHLY P&L
+  ══════════════════════════════════════════ -->
+  <div id="t4" class="panel">
+    <div class="sec-title"><div class="sec-num">4</div>תחזית P&amp;L חודשית</div>
+
+    <div class="card gap">
+      <div class="flbl" style="margin-bottom:12px;">מספר מטפלים פעילים החודש</div>
+      <div class="input-grid">
+        <div class="field"><label class="flbl">Starter (5/day)</label><input class="finp" id="pl_ts" type="number" value="8" onchange="calc4()"><div class="funit">בסיס + tokens $27.90/head</div></div>
+        <div class="field"><label class="flbl">Pro (15/day)</label><input class="finp" id="pl_tp" type="number" value="5" onchange="calc4()"><div class="funit">בסיס + tokens $43.90/head</div></div>
+        <div class="field"><label class="flbl">Unlimited (∞/day)</label><input class="finp" id="pl_tu" type="number" value="2" onchange="calc4()"><div class="funit">בסיס + tokens $60.90/head</div></div>
+        <div class="field"><label class="flbl">+ Audio add-on</label><input class="finp" id="pl_audio" type="number" value="6" onchange="calc4()"><div class="funit">כמה מהסה"כ לקחו אודיו</div></div>
+        <div class="field"><label class="flbl">+ Transcription (Starter only)</label><input class="finp" id="pl_trans" type="number" value="3" onchange="calc4()"><div class="funit">כמה מהסה"כ לקחו תמלול</div></div>
+        <div class="field"><label class="flbl">שם החודש</label><input class="finp wide" id="pl_month" type="text" value="מרץ 2026" onchange="calc4()"></div>
+      </div>
+    </div>
+
+    <div class="result-grid" id="res4"></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="flbl" style="margin-bottom:12px;">פירוט הכנסות vs עלויות</div>
+      <table class="data-table" id="tbl4"></table>
+    </div>
+    <div class="gap-sm"></div>
+    <div class="card-dark" id="breakeven4"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 5 — OFFER LETTER
+  ══════════════════════════════════════════ -->
+  <div id="t5" class="panel">
+    <div class="sec-title"><div class="sec-num">5</div>מחולל מכתב הצעה — עברית</div>
+
+    <div class="card gap">
+      <div class="input-grid">
+        <div class="field"><label class="flbl">שם הנמען</label><input class="finp wide" id="of_name" type="text" placeholder="ד״ר כהן / קליניקת שלום" oninput="genOffer()"></div>
+        <div class="field"><label class="flbl">גודל קבוצה</label><input class="finp" id="of_size" type="number" value="1" min="1" onchange="genOffer()"></div>
+        <div class="field"><label class="flbl">Tier</label>
+          <select class="finp" id="of_tier" onchange="genOffer()">
+            <option value="s">Starter — 5/day</option>
+            <option value="p">Pro — 15/day</option>
+            <option value="u">Unlimited — ∞/day</option>
+          </select>
+        </div>
+        <div class="field"><label class="flbl">הנחה % (0 = ללא)</label><input class="finp" id="of_disc" type="number" value="0" min="0" max="50" onchange="genOffer()"></div>
+        <div class="field"><label class="flbl">ניסיון חינם (ימים)</label><input class="finp" id="of_trial" type="number" value="14" onchange="genOffer()"></div>
+        <div class="field"><label class="flbl">מועד תפוגת הצעה</label><input class="finp wide" id="of_exp" type="text" placeholder="01.03.2026" oninput="genOffer()"></div>
+      </div>
+      <div class="addon-row">
+        <label class="addon-chk" id="oac_audio" onclick="toggleOfferAddon('audio')"><input type="checkbox" id="oa_audio"> 🎙️ הקלטת אודיו</label>
+        <label class="addon-chk" id="oac_trans" onclick="toggleOfferAddon('trans')"><input type="checkbox" id="oa_trans"> 📝 תמלול עברית</label>
+      </div>
+    </div>
+
+    <div class="card gap">
+      <div class="flbl" style="margin-bottom:10px;">טקסט ההצעה — מוכן לשליחה ב-WhatsApp</div>
+      <div class="offer-box" id="offerText">מלא את הפרטים למעלה...</div>
+      <div class="btn-row">
+        <button class="btn btn-jade" onclick="copyOffer()">📋 העתק לקליפבורד</button>
+        <button class="btn btn-gold" onclick="waOffer()">💬 שלח ב-WhatsApp</button>
+      </div>
+    </div>
+
+    <div class="card-gold">
+      <div class="flbl" style="margin-bottom:10px;">ניתוח רווחיות ההצעה</div>
+      <div class="result-grid" id="res5" style="margin-top:0;"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
 
 <script>
-// ══════════════════════════════════════════════
-//  MERIDIAN — PRIVATE ROI SIMULATOR
-//  roi_simulator_26022026.html
-//  Storage: localStorage only — 100% private
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+//  MERIDIAN — ROI PRICING INTELLIGENCE
+//  meridian_roi_tool_26022026.html
+//  PRIVATE — OWNER ONLY
+// ════════════════════════════════════════════════════
 
-const LS_DATA = 'mrd_roi_data_v1';
-const LS_PW   = 'mrd_roi_pw_v1';
+// ── DEFAULTS ──
+const DEFAULTS = {
+  v_claude:3.00, v_whisper:0.003, v_supa:25.00,
+  v_storage:0.021, v_egress:0.09, v_sessmin:50,
+  v_queries:8, v_tokens:2000, v_audiomb:23,
+  v_days:22, v_customers:20
+};
 
-// ── Hash password (obfuscation, not cryptography) ──
-function hashPW(pw) {
-  let h = 5381;
-  for (let i = 0; i < pw.length; i++) h = ((h << 5) + h) ^ pw.charCodeAt(i);
-  return 'mrd_' + (h >>> 0).toString(36);
+const TIER_DAILY = {s:5, p:15, u:25};
+const TIER_NAMES = {s:'Starter 5/day', p:'Pro 15/day', u:'Unlimited ∞/day'};
+
+// ── GET VARS ──
+function V(id){ return parseFloat(document.getElementById(id).value)||0; }
+function getVars(){
+  return {
+    claudePer1M: V('v_claude'),
+    whisperPerMin: V('v_whisper'),
+    supaFlat: V('v_supa'),
+    storagePerGB: V('v_storage'),
+    egressPerGB: V('v_egress'),
+    sessMin: V('v_sessmin'),
+    queriesPerSess: V('v_queries'),
+    tokensPerQuery: V('v_tokens'),
+    audioMBPerSess: V('v_audiomb'),
+    workDays: V('v_days'),
+    customers: V('v_customers'),
+  };
 }
 
-// ══ GATE ══
-let gateStep = localStorage.getItem(LS_PW) ? 'login' : 'set1';
-let pendingPW = '';
+// ── CORE COST CALC ──
+function calcCosts(tier, addAudio, addTrans, vars) {
+  const v = vars || getVars();
+  const daily = TIER_DAILY[tier];
+  const monthly = daily * v.workDays;
+  // Token cost
+  const tokPerSess = v.queriesPerSess * v.tokensPerQuery;
+  const tokenCost = monthly * (tokPerSess / 1_000_000) * v.claudePer1M;
+  // Platform share
+  const platShare = v.supaFlat / Math.max(v.customers, 1);
+  // Audio
+  const audioGB = monthly * (v.audioMBPerSess / 1024);
+  const audioCost = addAudio ? audioGB * (v.storagePerGB + v.egressPerGB) : 0;
+  // Transcription
+  const whisperCost = addTrans ? monthly * v.sessMin * v.whisperPerMin : 0;
+  const transCost = addTrans ? audioCost + whisperCost : 0;
 
-if (gateStep === 'set1') {
-  document.getElementById('gateSub').textContent  = 'פעם ראשונה — הגדר סיסמה פרטית';
-  document.getElementById('gateHint').textContent = 'בחר סיסמה שתזכור (לפחות 3 תווים)';
-  document.getElementById('gateBtn').textContent  = 'הגדר סיסמה ←';
-} else {
-  document.getElementById('gateHint').textContent = 'הזן את הסיסמה שהגדרת';
+  return {
+    monthly, tokenCost, platShare,
+    audioCost: addAudio ? audioGB * (v.storagePerGB + v.egressPerGB) : 0,
+    whisperCost, transCost,
+    totalCost: tokenCost + platShare + audioCost + (addTrans ? whisperCost : 0),
+  };
 }
 
-function gateSubmit() {
-  const val = document.getElementById('gateInput').value.trim();
-  const err = document.getElementById('gateErr');
-  err.textContent = '';
+function fmt2(n){ return n.toFixed(2); }
+function fmtPct(p){ return p.toFixed(0)+'%'; }
+function profitColor(pct){ return pct >= 40 ? 'green' : pct >= 0 ? 'amber' : 'red'; }
+function profitClass(pct){ return pct >= 40 ? 'profit' : pct >= 0 ? 'warn' : 'loss'; }
 
-  if (!val || val.length < 3) {
-    err.textContent = '⚠️ סיסמה חייבת להכיל לפחות 3 תווים';
-    shake();
-    return;
-  }
+// ── PROFIT METER ──
+function meterHTML(pct) {
+  const clamped = Math.min(Math.max(pct, 0), 200);
+  const pct50 = Math.min(clamped / 200 * 100, 100);
+  const col = pct >= 50 ? '#27ae60' : pct >= 0 ? '#f39c12' : '#e74c3c';
+  return `<div class="meter-wrap">
+    <div class="meter-bar"><div class="meter-fill" style="width:${pct50}%;background:${col};"></div></div>
+    <div class="meter-labels"><span>0%</span><span>50% target</span><span>100%</span><span>200%</span></div>
+  </div>`;
+}
 
-  if (gateStep === 'set1') {
-    pendingPW = val;
-    gateStep  = 'set2';
-    document.getElementById('gateSub').textContent  = 'אמת סיסמה — הקלד שוב';
-    document.getElementById('gateHint').textContent = 'הזן שוב את אותה הסיסמה לאימות';
-    document.getElementById('gateBtn').textContent  = 'אמת ←';
-    document.getElementById('gateInput').value = '';
-    return;
-  }
-  if (gateStep === 'set2') {
-    if (val !== pendingPW) {
-      err.textContent = '❌ הסיסמאות אינן תואמות — נסה שוב';
-      gateStep = 'set1'; pendingPW = '';
-      document.getElementById('gateInput').value = '';
-      document.getElementById('gateSub').textContent  = 'פעם ראשונה — הגדר סיסמה פרטית';
-      document.getElementById('gateHint').textContent = 'בחר סיסמה שתזכור';
-      document.getElementById('gateBtn').textContent  = 'הגדר סיסמה ←';
-      shake();
-      return;
-    }
-    localStorage.setItem(LS_PW, hashPW(val));
-    openApp();
-    return;
-  }
-  // login
-  if (hashPW(val) === localStorage.getItem(LS_PW)) {
-    openApp();
+// ══ TAB SWITCHING ══
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  recalcAll();
+}
+
+// ══════════════════════════════════════════
+//  TAB 1 — SINGLE THERAPIST
+// ══════════════════════════════════════════
+let t1_tier='s', t1_audio=false, t1_trans=false;
+
+function selTier1(t){
+  t1_tier=t;
+  ['s','p','u'].forEach(x=>document.getElementById('ts1_'+x).classList.toggle('sel',x===t));
+  // Auto-update token price field
+  const prices={s:9,p:25,u:42};
+  document.getElementById('p1_tok').value=prices[t];
+  calc1();
+}
+function toggleAddon1(type){
+  if(type==='audio'){t1_audio=!t1_audio; document.getElementById('ac1_audio').classList.toggle('on',t1_audio);}
+  if(type==='trans'){t1_trans=!t1_trans; document.getElementById('ac1_trans').classList.toggle('on',t1_trans);}
+  calc1();
+}
+
+function calc1(){
+  const v = getVars();
+  const c = calcCosts(t1_tier, t1_audio, t1_trans, v);
+  const disc = V('sl1_disc') / 100;
+
+  const pBase = V('p1_base');
+  const pTok  = V('p1_tok');
+  const pAudio= t1_audio ? V('p1_audio') : 0;
+  const pTrans= t1_trans ? V('p1_trans') : 0;
+  const pTotal= (pBase + pTok + pAudio + pTrans) * (1 - disc);
+  const profit = pTotal - c.totalCost;
+  const pct = c.totalCost > 0 ? (profit / c.totalCost) * 100 : 0;
+  const breakevenSess = pBase > 0 ? Math.ceil(c.totalCost / (pBase / c.monthly)) : 0;
+
+  const resEl = document.getElementById('res1');
+  resEl.innerHTML = `
+    <div class="result-card ${profitClass(pct)}">
+      <div class="rc-label">עלות אמיתית/חודש</div>
+      <div class="rc-value ${profitColor(pct) === 'red' ? 'red' : 'amber'}">$${fmt2(c.totalCost)}</div>
+      <div class="rc-sub">${c.monthly} sessions</div>
+    </div>
+    <div class="result-card ${profitClass(pct)}">
+      <div class="rc-label">מחיר שגובים</div>
+      <div class="rc-value gold">$${fmt2(pTotal)}</div>
+      <div class="rc-sub">${disc>0?'אחרי הנחה '+fmtPct(disc*100):''}</div>
+    </div>
+    <div class="result-card ${profitClass(pct)}">
+      <div class="rc-label">רווח נקי</div>
+      <div class="rc-value ${profitColor(pct)}">$${fmt2(profit)}</div>
+      <div class="rc-sub">/חודש</div>
+    </div>
+    <div class="result-card ${profitClass(pct)}">
+      <div class="rc-label">אחוז רווח</div>
+      <div class="rc-value ${profitColor(pct)}">${fmtPct(pct)}</div>
+      <div class="rc-sub">יעד: 50%+</div>
+    </div>
+  `;
+
+  const tbl = document.getElementById('tbl1');
+  tbl.innerHTML = `<thead><tr>
+    <th>פריט</th><th>עלות אמיתית/חודש</th><th>מחיר שגובים</th><th>רווח $</th><th>רווח %</th>
+  </tr></thead><tbody>
+    <tr><td>בסיס Core (AI + platform)</td>
+      <td class="mono">$${fmt2(c.tokenCost + c.platShare)}</td>
+      <td class="mono">$${fmt2(pBase*(1-disc))}</td>
+      <td class="mono ${(pBase*(1-disc)-(c.tokenCost+c.platShare))>=0?'green':'red'}">$${fmt2(pBase*(1-disc)-(c.tokenCost+c.platShare))}</td>
+      <td class="mono ${profitColor((pBase*(1-disc)/(c.tokenCost+c.platShare)-1)*100)}">${fmtPct((pBase*(1-disc)/(c.tokenCost+c.platShare)-1)*100)}</td>
+    </tr>
+    <tr><td>Tokens (${TIER_NAMES[t1_tier]})</td>
+      <td class="mono">$${fmt2(c.tokenCost)}</td>
+      <td class="mono">$${fmt2(pTok*(1-disc))}</td>
+      <td class="mono ${(pTok*(1-disc)-c.tokenCost)>=0?'green':'red'}">$${fmt2(pTok*(1-disc)-c.tokenCost)}</td>
+      <td class="mono ${profitColor(c.tokenCost>0?(pTok*(1-disc)/c.tokenCost-1)*100:999)}">${c.tokenCost>0?fmtPct((pTok*(1-disc)/c.tokenCost-1)*100):'∞'}</td>
+    </tr>
+    ${t1_audio?`<tr><td>Audio recording</td>
+      <td class="mono">$${fmt2(c.audioCost)}</td>
+      <td class="mono">$${fmt2(pAudio*(1-disc))}</td>
+      <td class="mono ${(pAudio*(1-disc)-c.audioCost)>=0?'green':'red'}">$${fmt2(pAudio*(1-disc)-c.audioCost)}</td>
+      <td class="mono green">${c.audioCost>0?fmtPct((pAudio*(1-disc)/c.audioCost-1)*100):'∞'}</td>
+    </tr>`:''}
+    ${t1_trans?`<tr><td>Transcription Hebrew</td>
+      <td class="mono">$${fmt2(c.whisperCost)}</td>
+      <td class="mono">$${fmt2(pTrans*(1-disc))}</td>
+      <td class="mono ${(pTrans*(1-disc)-c.whisperCost)>=0?'green':'red'}">$${fmt2(pTrans*(1-disc)-c.whisperCost)}</td>
+      <td class="mono ${profitColor(c.whisperCost>0?(pTrans*(1-disc)/c.whisperCost-1)*100:-100)}">${c.whisperCost>0?fmtPct((pTrans*(1-disc)/c.whisperCost-1)*100):'∞'}</td>
+    </tr>`:''}
+    <tr style="font-weight:700;background:rgba(255,255,255,0.04);">
+      <td>סה"כ</td>
+      <td class="mono">$${fmt2(c.totalCost)}</td>
+      <td class="mono">$${fmt2(pTotal)}</td>
+      <td class="mono ${profit>=0?'green':'red'}">$${fmt2(profit)}</td>
+      <td class="mono ${profitColor(pct)}">${fmtPct(pct)}</td>
+    </tr>
+  </tbody>`;
+
+  const warn = document.getElementById('warn1');
+  if(pct < 0){
+    warn.classList.add('visible');
+    warn.innerHTML = `⚠️ <strong>אתה מפסיד כסף!</strong> עלות אמיתית $${fmt2(c.totalCost)} > מחיר $${fmt2(pTotal)}. העלה את המחיר ב-$${fmt2(c.totalCost-pTotal+c.totalCost*0.5)} לפחות (יעד 50% רווח).`;
+  } else if(pct < 30){
+    warn.classList.add('visible');
+    warn.innerHTML = `⚠️ רווח נמוך מ-30% — שקול להעלות מחיר. יעד: $${fmt2(c.totalCost*1.5)} לחיוב.`;
   } else {
-    err.textContent = '❌ סיסמה שגויה';
-    document.getElementById('gateInput').value = '';
-    shake();
+    warn.classList.remove('visible');
   }
 }
 
-function shake() {
-  const s = document.getElementById('gateSafe');
-  s.style.animation = 'shake .4s ease';
-  setTimeout(() => s.style.animation = '', 400);
-}
+// ══════════════════════════════════════════
+//  TAB 2 — WHAT-IF
+// ══════════════════════════════════════════
+function calc2(){
+  const v = getVars();
+  const pBase=V('w_base'), pTs=V('w_ts'), pTp=V('w_tp'), pTu=V('w_tu');
+  const pAudio=V('w_audio'), pTrans=V('w_trans');
 
-function openApp() {
-  const g = document.getElementById('gateWrap');
-  g.style.transition = 'opacity .4s';
-  g.style.opacity    = '0';
-  setTimeout(() => {
-    g.style.display = 'none';
-    document.getElementById('appWrap').style.display = 'block';
-    loadData();
-  }, 400);
-}
-
-function lockApp() {
-  // kept for internal use only (back-compat)
-  document.getElementById('appWrap').style.display = 'none';
-  const g = document.getElementById('gateWrap');
-  g.style.display = 'flex'; g.style.opacity = '1';
-  document.getElementById('gateInput').value = '';
-  document.getElementById('gateErr').textContent = '';
-  gateStep = 'login';
-  document.getElementById('gateSub').textContent  = 'סימולטור הכנסות פרטי — MERIDIAN';
-  document.getElementById('gateHint').textContent = 'הזן את הסיסמה שהגדרת';
-  document.getElementById('gateBtn').textContent  = 'פתח את הסימולטור ←';
-}
-
-// ── מחק והתחל חישוב מחדש ──────────────────────────
-// Clears all income rows + resets to 3 blank rows
-// Keeps: expenses, password, month
-function clearAndReset() {
-  if (!confirm('זה ימחק את כל שורות המטופלים ויתחיל חישוב חדש.\nהוצאות קבועות ישמרו.\nלהמשיך?')) return;
-  S.patients = [
-    {id:'p'+Date.now(),   name:'',sessions:1,rate:0},
-    {id:'p'+(Date.now()+1),name:'',sessions:1,rate:0},
-    {id:'p'+(Date.now()+2),name:'',sessions:1,rate:0},
-  ];
-  localStorage.setItem(LS_DATA, JSON.stringify(S));
-  renderAll();
-  calcAll();
-  showToast('✅ הכנסות נוקו — הוצאות נשמרו');
-}
-
-function resetPassword() {
-  if (!confirm('איפוס יוחק את הסיסמה וכל הנתונים הנשמרים. להמשיך?')) return;
-  localStorage.removeItem(LS_PW);
-  localStorage.removeItem(LS_DATA);
-  location.reload();
-}
-
-document.getElementById('gateInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') gateSubmit();
-});
-
-// ══ STATE ══
-const DEFAULT_EXPENSES = [
-  {id:'e1', label:'שכירות קליניקה / חדר',      amount:0,   locked:true},
-  {id:'e2', label:'חשמל / ארנונה / ועד בית',   amount:0,   locked:true},
-  {id:'e3', label:'MERIDIAN — מנוי חודשי',      amount:150, locked:true},
-  {id:'e4', label:'עלות טוקנים AI (הערכה)',      amount:0,   locked:true},
-  {id:'e5', label:'הוצאה נוספת 1',              amount:0,   locked:false},
-  {id:'e6', label:'הוצאה נוספת 2',              amount:0,   locked:false},
-  {id:'e7', label:'הוצאה נוספת 3',              amount:0,   locked:false},
-];
-
-let S = { month:'פברואר 2026', patients:[], expenses:[] };
-
-// ══ LOAD / SAVE ══
-function loadData() {
-  const raw = localStorage.getItem(LS_DATA);
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw);
-      S = { ...S, ...parsed };
-      // Make sure all default expenses exist
-      DEFAULT_EXPENSES.forEach(def => {
-        if (!S.expenses.find(e => e.id === def.id))
-          S.expenses.push({...def});
-      });
-    } catch(e) { initDefaults(); }
-  } else {
-    initDefaults();
-  }
-  // Sync month selector
-  const sel = document.getElementById('monthSel');
-  for (let i = 0; i < sel.options.length; i++) {
-    if (sel.options[i].text === S.month) { sel.selectedIndex = i; break; }
-  }
-  renderAll(); calcAll();
-}
-
-function initDefaults() {
-  S.expenses = DEFAULT_EXPENSES.map(e => ({...e}));
-  S.patients = [
-    {id:'p1',name:'',sessions:1,rate:0},
-    {id:'p2',name:'',sessions:1,rate:0},
-    {id:'p3',name:'',sessions:1,rate:0},
-  ];
-}
-
-function saveData() {
-  S.month = document.getElementById('monthSel').options[document.getElementById('monthSel').selectedIndex].text;
-  localStorage.setItem(LS_DATA, JSON.stringify(S));
-  showToast('✅ נשמר בהצלחה');
-}
-
-function onMonthChange() {
-  S.month = document.getElementById('monthSel').options[document.getElementById('monthSel').selectedIndex].text;
-  document.getElementById('blMonth').textContent = S.month;
-}
-
-// ══ RENDER ══
-function renderAll() {
-  renderIncome();
-  renderExpenses();
-  document.getElementById('blMonth').textContent = S.month;
-}
-
-function renderIncome() {
-  const tbody = document.getElementById('incTbody');
-  tbody.innerHTML = '';
-  S.patients.forEach((p, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><span class="rn">${i+1}</span></td>
-      <td><input class="ci" value="${esc(p.name)}" placeholder="שם מטופל..."
-          oninput="S.patients[${i}].name=this.value"></td>
-      <td><input class="ci num" type="number" min="0" value="${p.sessions}"
-          oninput="S.patients[${i}].sessions=+this.value||0;recalcRow(${i})"></td>
-      <td><input class="ci num" type="number" min="0" value="${p.rate}" placeholder="₪"
-          oninput="S.patients[${i}].rate=+this.value||0;recalcRow(${i})"></td>
-      <td><input class="ci tot" id="ptot${i}" value="₪${fmt(p.sessions*p.rate)}" readonly></td>
-      <td><button class="del" onclick="rmPatient(${i})">✕</button></td>
-    `;
-    tbody.appendChild(tr);
+  const rows = [];
+  // Base only
+  ['s','p','u'].forEach(tier=>{
+    const c = calcCosts(tier,false,false,v);
+    const price = pBase + (tier==='s'?pTs:tier==='p'?pTp:pTu);
+    const profit = price - c.totalCost;
+    const pct = (profit/c.totalCost)*100;
+    rows.push({label:`Core + ${TIER_NAMES[tier]}`, cost:c.totalCost, price, profit, pct, tier});
   });
-}
-
-function recalcRow(i) {
-  const el = document.getElementById('ptot'+i);
-  if (el) el.value = '₪' + fmt((S.patients[i].sessions||0) * (S.patients[i].rate||0));
-  calcAll();
-}
-
-function renderExpenses() {
-  const tbody = document.getElementById('expTbody');
-  tbody.innerHTML = '';
-  S.expenses.forEach((e, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><span class="rn">${i+1}</span></td>
-      <td>${e.locked
-        ? `<input class="ci dim" value="${esc(e.label)}" readonly>`
-        : `<input class="ci" value="${esc(e.label)}" placeholder="שם הוצאה..."
-             oninput="S.expenses[${i}].label=this.value">`
-      }</td>
-      <td><input class="ci num" type="number" min="0" value="${e.amount||0}" placeholder="₪"
-          oninput="S.expenses[${i}].amount=+this.value||0;calcAll()"></td>
-      <td>${e.locked
-        ? `<span class="lock-icon">🔒</span>`
-        : `<button class="del" onclick="rmExpense(${i})">✕</button>`
-      }</td>
-    `;
-    tbody.appendChild(tr);
+  // + Audio
+  ['s','p','u'].forEach(tier=>{
+    const c = calcCosts(tier,true,false,v);
+    const price = pBase + (tier==='s'?pTs:tier==='p'?pTp:pTu) + pAudio;
+    const profit = price - c.totalCost;
+    const pct = (profit/c.totalCost)*100;
+    rows.push({label:`Core + ${TIER_NAMES[tier]} + Audio`, cost:c.totalCost, price, profit, pct, tier});
   });
-}
-
-// ══ CALC ══
-function calcAll() {
-  let totalInc = 0, ptCount = 0;
-  S.patients.forEach(p => {
-    const t = (p.sessions||0)*(p.rate||0);
-    totalInc += t;
-    if (p.name || p.rate > 0) ptCount++;
+  // + Trans (Starter only safe)
+  ['s','p','u'].forEach(tier=>{
+    const c = calcCosts(tier,true,true,v);
+    const price = pBase + (tier==='s'?pTs:tier==='p'?pTp:pTu) + pAudio + pTrans;
+    const profit = price - c.totalCost;
+    const pct = (profit/c.totalCost)*100;
+    rows.push({label:`Core + ${TIER_NAMES[tier]} + Audio + Trans`, cost:c.totalCost, price, profit, pct, tier});
   });
 
-  let totalExp = 0;
-  S.expenses.forEach(e => { totalExp += (e.amount||0); });
+  const tbl = document.getElementById('tbl2');
+  tbl.innerHTML = `<thead><tr>
+    <th>חבילה</th><th>עלות אמיתית/חודש</th><th>מחיר</th><th>רווח $</th><th>רווח %</th><th>סטטוס</th>
+  </tr></thead><tbody>` +
+  rows.map(r=>`<tr>
+    <td>${r.label}</td>
+    <td class="mono">$${fmt2(r.cost)}</td>
+    <td class="mono gold">$${fmt2(r.price)}</td>
+    <td class="mono ${r.profit>=0?'green':'red'}">$${fmt2(r.profit)}</td>
+    <td class="mono ${profitColor(r.pct)}">${fmtPct(r.pct)}</td>
+    <td>${r.pct>=50?'✅ טוב':r.pct>=0?'⚠️ נמוך':'❌ הפסד'}</td>
+  </tr>`).join('') + '</tbody>';
 
-  const profit = totalInc - totalExp;
+  // Max package
+  const cMax = calcCosts('u',true,true,v);
+  const priceMax = pBase + pTu + pAudio + pTrans;
+  const profitMax = priceMax - cMax.totalCost;
+  const pctMax = (profitMax/cMax.totalCost)*100;
+  document.getElementById('maxPackage').innerHTML = `
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;">
+      <div><div class="rc-label">מחיר מלא</div><div class="big-num">$${fmt2(priceMax)}</div><div class="rc-sub">/חודש</div></div>
+      <div><div class="rc-label">עלות אמיתית</div><div style="font-family:'Abril Fatface',serif;font-size:32px;color:var(--red);">$${fmt2(cMax.totalCost)}</div></div>
+      <div><div class="rc-label">רווח נקי</div><div style="font-family:'Abril Fatface',serif;font-size:32px;color:${profitMax>=0?'var(--green2)':'var(--red)'};">$${fmt2(profitMax)}</div></div>
+      <div><div class="rc-label">% רווח</div><div style="font-family:'Abril Fatface',serif;font-size:32px;color:var(--gold2);">${fmtPct(pctMax)}</div></div>
+    </div>
+    ${meterHTML(pctMax)}
+  `;
+}
 
-  // Dashboard
-  // dashboard cards removed — totals shown in bottom line only
-  // ptCount tracked: ptCount (used in ROI calc)
+// ══════════════════════════════════════════
+//  TAB 3 — GROUP DISCOUNT
+// ══════════════════════════════════════════
+let groupRows = [{tier:'s',audio:false,trans:false,name:'מטפל 1'}];
 
-  // profit badge removed with dashboard
+function addGroupRow(){
+  groupRows.push({tier:'s',audio:false,trans:false,name:`מטפל ${groupRows.length+1}`});
+  renderGroupList(); calc3();
+}
+function removeGroupRow(i){ groupRows.splice(i,1); renderGroupList(); calc3(); }
+function clearGroup(){ groupRows=[{tier:'s',audio:false,trans:false,name:'מטפל 1'}]; renderGroupList(); calc3(); }
 
-  // Section totals
-  if(document.getElementById('incSum')) document.getElementById('incSum').textContent = '₪'+fmt(totalInc);
-  if(document.getElementById('expSum')) document.getElementById('expSum').textContent = '₪'+fmt(totalExp);
-
-  // Bottom line
-  document.getElementById('blInc').textContent = '₪'+fmt(totalInc);
-  document.getElementById('blExp').textContent = '₪'+fmt(totalExp);
-  const blP = document.getElementById('blProfit');
-  blP.textContent = (profit<0?'-':'')+'₪'+fmt(Math.abs(profit));
-  blP.className = 'bl-val '+(profit>0?'g':profit<0?'r':'gold');
-
-  // ROI Insight
-  const ins = document.getElementById('roiInsight');
-  const totalSessions   = S.patients.reduce((s,p)=>s+(p.sessions||0),0);
-  const avgRatePerSess  = totalSessions > 0 && totalInc > 0 ? totalInc/totalSessions : 0;
-  const targetProfit    = Math.max(totalExp * 0.5, 1500);  // "reasonable profit" = 50% above expenses, min ₪1,500
-
-  // ── Always show minimum-sessions block when expenses are set ──
-  if (totalExp > 0) {
-    const avgPt               = ptCount > 0 ? Math.round(totalInc/ptCount) : 0;
-    const roiPct              = totalInc > 0 && totalExp > 0 ? ((profit/totalExp)*100).toFixed(0) : null;
-    const perNIS              = totalInc > 0 && totalExp > 0 ? (totalInc/totalExp).toFixed(2) : null;
-    const minSessionsBreakeven= avgRatePerSess > 0 ? Math.ceil(totalExp / avgRatePerSess) : null;
-    const minSessionsProfit   = avgRatePerSess > 0 ? Math.ceil((totalExp + targetProfit) / avgRatePerSess) : null;
-    const breakevenPt         = avgPt > 0 ? Math.ceil(totalExp / avgPt) : null;
-
-    // ── Performance stats (only when income entered) ──
-    const statsHtml = totalInc > 0 ? `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;text-align:right;">
-        <div>💡 הכנסה ממוצעת למטופל: <strong style="color:#2d7a1a;">₪${fmt(avgPt)}</strong></div>
-        <div>📊 ROI על הוצאות: <strong style="color:${profit>=0?'#1a5c35':'#c0392b'};">${roiPct}%</strong></div>
-        <div>💎 כל ₪1 שהוצאת הכניס: <strong style="color:#2d7a1a;">₪${perNIS}</strong></div>
-        <div>🔢 סה"כ טיפולים החודש: <strong style="color:#2d7a1a;">${totalSessions}</strong></div>
+function renderGroupList(){
+  const el = document.getElementById('grpList');
+  el.innerHTML = groupRows.map((r,i)=>`
+    <div class="grp-row">
+      <input class="finp wide" value="${r.name}" placeholder="שם מטפל ${i+1}"
+        oninput="groupRows[${i}].name=this.value;calc3()">
+      <select class="finp" onchange="groupRows[${i}].tier=this.value;updateGrpPriceField(${i});calc3()">
+        <option value="s" ${r.tier==='s'?'selected':''}>Starter 5/day</option>
+        <option value="p" ${r.tier==='p'?'selected':''}>Pro 15/day</option>
+        <option value="u" ${r.tier==='u'?'selected':''}>Unlimited ∞/day</option>
+      </select>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <label class="addon-chk ${r.audio?'on':''}" onclick="groupRows[${i}].audio=!groupRows[${i}].audio;this.classList.toggle('on');calc3()">
+          🎙️ Audio
+        </label>
+        <label class="addon-chk ${r.trans?'on':''}" onclick="groupRows[${i}].trans=!groupRows[${i}].trans;this.classList.toggle('on');calc3()">
+          📝 Trans
+        </label>
       </div>
-      <div style="border-bottom:1px solid rgba(0,0,0,0.08);padding-bottom:12px;margin-bottom:12px;">
-        ${profit >= 0
-          ? `✅ <strong style="color:#1a5c35;">נקודת איזון הושגה!</strong> כיסית את כל ההוצאות ב-${breakevenPt} מטופל${breakevenPt!==1?'ים':''}`
-          : `⚠️ דרושים עוד <strong style="color:#c0392b;">₪${fmt(Math.abs(profit))}</strong> להגיע לנקודת איזון`
-        }
-      </div>` : '';
-
-    // ── Minimum sessions conclusion — always shown when expenses > 0 ──
-    const avgRateDisplay = avgRatePerSess > 0 ? fmt(Math.round(avgRatePerSess)) : '?';
-    const conclusionHtml = `
-      <div style="background:rgba(13,92,50,0.1);border:2px solid rgba(13,92,50,0.3);border-radius:10px;padding:14px 16px;text-align:right;line-height:2;">
-        <div style="font-size:13px;font-weight:700;color:#0d3320;margin-bottom:6px;">📌 דוח מסקנות — ${S.month}</div>
-        <div>
-          לכיסוי הוצאות בלבד (₪${fmt(totalExp)}/חודש):
-          <strong style="color:#c0392b;font-size:16px;"> ${minSessionsBreakeven ? minSessionsBreakeven+' טיפולים' : '— הזן תעריף'}</strong>
-        </div>
-        <div>
-          לרווח סביר (+₪${fmt(targetProfit)}):
-          <strong style="color:#1a5c35;font-size:16px;"> ${minSessionsProfit ? minSessionsProfit+' טיפולים' : '— הזן תעריף'}</strong>
-          ${avgRatePerSess > 0 ? `<span style="color:rgba(20,40,20,0.55);font-size:11px;">@ ממוצע ₪${avgRateDisplay}/טיפול</span>` : ''}
-        </div>
-        ${avgRatePerSess === 0
-          ? '<div style="font-size:11px;color:rgba(20,40,20,0.55);margin-top:4px;">💡 הזן תעריפים בטבלת הכנסות לקבלת חישוב מדויק</div>'
-          : ''
-        }
-      </div>`;
-
-    ins.innerHTML = statsHtml + conclusionHtml;
-
-  } else {
-    ins.innerHTML = '<div style="color:rgba(20,40,20,0.55);">הזן הוצאות קבועות למעלה — ייחושב מינימום הטיפולים הנדרש לרווחיות</div>';
-  }
+      <button class="grp-del" onclick="removeGroupRow(${i})">✕</button>
+    </div>
+  `).join('');
 }
 
-// ══ ROW MANAGEMENT ══
-function addPatient() {
-  S.patients.push({id:'p'+Date.now(),name:'',sessions:1,rate:0});
-  renderAll(); calcAll();
+function updateGrpPriceField(i){}
+
+function calc3(){
+  const v = getVars();
+  const minMargin = V('grp_margin') / 100;
+  const reqDisc = V('grp_disc') / 100;
+  const grpName = document.getElementById('grp_name').value || 'הקבוצה';
+
+  const tokPrices = {s:9,p:25,u:42};
+  const audioPrc = 8, transPrc = 28, basePrc = 18.90;
+
+  let totalCost=0, totalFullPrice=0;
+  const details = groupRows.map(r=>{
+    const c = calcCosts(r.tier, r.audio, r.trans, v);
+    const fp = basePrc + tokPrices[r.tier] + (r.audio?audioPrc:0) + (r.trans?transPrc:0);
+    totalCost += c.totalCost;
+    totalFullPrice += fp;
+    return {name:r.name, tier:TIER_NAMES[r.tier], cost:c.totalCost, fullPrice:fp, addons:(r.audio?'🎙️ ':'')+(r.trans?'📝 ':'')};
+  });
+
+  const discPrice = totalFullPrice * (1 - reqDisc);
+  const maxDiscForMargin = 1 - (totalCost * (1 + minMargin)) / totalFullPrice;
+  const profitAfterDisc = discPrice - totalCost;
+  const pctAfterDisc = (profitAfterDisc / totalCost) * 100;
+  const recDiscPct = maxDiscForMargin * 100;
+  const pricePerHead = discPrice / Math.max(groupRows.length, 1);
+
+  const res3 = document.getElementById('res3');
+  res3.innerHTML = `
+    <div class="result-card gold">
+      <div class="rc-label">מחיר מלא ל-${groupRows.length} מטפלים</div>
+      <div class="rc-value gold">$${fmt2(totalFullPrice)}</div>
+      <div class="rc-sub">ללא הנחה</div>
+    </div>
+    <div class="result-card ${profitClass(pctAfterDisc)}">
+      <div class="rc-label">מחיר אחרי הנחה ${fmtPct(reqDisc*100)}</div>
+      <div class="rc-value ${profitColor(pctAfterDisc)}">$${fmt2(discPrice)}</div>
+      <div class="rc-sub">$${fmt2(pricePerHead)}/מטפל</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-label">עלות אמיתית לך</div>
+      <div class="rc-value amber">$${fmt2(totalCost)}</div>
+      <div class="rc-sub">/חודש</div>
+    </div>
+    <div class="result-card ${profitClass(pctAfterDisc)}">
+      <div class="rc-label">רווח אחרי הנחה</div>
+      <div class="rc-value ${profitColor(pctAfterDisc)}">$${fmt2(profitAfterDisc)}</div>
+      <div class="rc-sub">${fmtPct(pctAfterDisc)}</div>
+    </div>
+    <div class="result-card gold">
+      <div class="rc-label">הנחה מקסימלית ל-${fmtPct(minMargin*100)} רווח</div>
+      <div class="rc-value jade">${fmtPct(Math.max(recDiscPct,0))}</div>
+      <div class="rc-sub">אל תעבור זאת</div>
+    </div>
+  `;
+
+  const warn3 = document.getElementById('warn3');
+  if(reqDisc > maxDiscForMargin){
+    warn3.classList.add('visible');
+    warn3.innerHTML = `⚠️ הנחה של ${fmtPct(reqDisc*100)} מורידה אותך ל-${fmtPct(pctAfterDisc)} רווח — מתחת ליעד ${fmtPct(minMargin*100)}.<br>
+    הנחה מקסימלית בטוחה: <strong>${fmtPct(Math.max(recDiscPct,0))}</strong> → $${fmt2(totalFullPrice*(1-Math.max(maxDiscForMargin,0)))} לחודש.`;
+  } else { warn3.classList.remove('visible'); }
+
+  const grpTbl = document.getElementById('grpTable');
+  grpTbl.innerHTML = `
+    <div class="flbl" style="margin-bottom:10px;">פירוט לפי מטפל</div>
+    <table class="data-table"><thead><tr>
+      <th>מטפל</th><th>Tier</th><th>תוספות</th><th>מחיר מלא</th><th>מחיר אחרי הנחה</th><th>עלות אמיתית</th><th>רווח</th>
+    </tr></thead><tbody>` +
+    details.map(d=>`<tr>
+      <td>${d.name}</td>
+      <td>${d.tier}</td>
+      <td>${d.addons||'—'}</td>
+      <td class="mono">$${fmt2(d.fullPrice)}</td>
+      <td class="mono gold">$${fmt2(d.fullPrice*(1-reqDisc))}</td>
+      <td class="mono amber">$${fmt2(d.cost)}</td>
+      <td class="mono ${(d.fullPrice*(1-reqDisc)-d.cost)>=0?'green':'red'}">$${fmt2(d.fullPrice*(1-reqDisc)-d.cost)}</td>
+    </tr>`).join('') +
+    `<tr style="font-weight:700;background:rgba(255,255,255,0.04);">
+      <td colspan="3">סה"כ קבוצה</td>
+      <td class="mono">$${fmt2(totalFullPrice)}</td>
+      <td class="mono gold">$${fmt2(discPrice)}</td>
+      <td class="mono amber">$${fmt2(totalCost)}</td>
+      <td class="mono ${profitAfterDisc>=0?'green':'red'}">$${fmt2(profitAfterDisc)}</td>
+    </tr></tbody></table>`;
 }
 
-function rmPatient(i) {
-  if (S.patients.length <= 1) return;
-  S.patients.splice(i,1);
-  renderAll(); calcAll();
+// ══════════════════════════════════════════
+//  TAB 4 — MONTHLY P&L
+// ══════════════════════════════════════════
+function calc4(){
+  const v = getVars();
+  const nTs=V('pl_ts'), nTp=V('pl_tp'), nTu=V('pl_tu');
+  const nAudio=V('pl_audio'), nTrans=V('pl_trans');
+  const month=document.getElementById('pl_month').value||'החודש';
+  const tokPrices={s:9,p:25,u:42}, basePrc=18.90, audioPrc=8, transPrc=28;
+
+  // Revenue
+  const revBase = (nTs+nTp+nTu)*basePrc;
+  const revTok  = nTs*tokPrices.s + nTp*tokPrices.p + nTu*tokPrices.u;
+  const revAudio= nAudio*audioPrc;
+  const revTrans= nTrans*transPrc;
+  const totalRev= revBase+revTok+revAudio+revTrans;
+
+  // Costs
+  const cTs = calcCosts('s',false,false,v), cTp = calcCosts('p',false,false,v), cTu = calcCosts('u',false,false,v);
+  const costTok  = nTs*cTs.tokenCost + nTp*cTp.tokenCost + nTu*cTu.tokenCost;
+  const costSupa = v.supaFlat; // flat — not per user
+  const cAudio   = calcCosts('s',true,false,v);
+  const costAudio= nAudio*(cAudio.audioCost);
+  const cTrans   = calcCosts('s',false,true,v);
+  const costTrans= nTrans*(cTrans.whisperCost);
+  const totalCost= costTok+costSupa+costAudio+costTrans;
+
+  const profit = totalRev - totalCost;
+  const pct = totalCost > 0 ? (profit/totalCost)*100 : 0;
+  const totalTherapists = nTs+nTp+nTu;
+  const breakevenTh = totalCost > 0 ? Math.ceil(totalCost / (totalRev / Math.max(totalTherapists,1))) : 0;
+
+  document.getElementById('res4').innerHTML = `
+    <div class="result-card gold">
+      <div class="rc-label">הכנסה ברוטו — ${month}</div>
+      <div class="rc-value gold">$${fmt2(totalRev)}</div>
+      <div class="rc-sub">${totalTherapists} מטפלים פעילים</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-label">עלות API סה"כ</div>
+      <div class="rc-value amber">$${fmt2(totalCost)}</div>
+      <div class="rc-sub">כולל Supabase</div>
+    </div>
+    <div class="result-card ${profitClass(pct)}">
+      <div class="rc-label">רווח נקי</div>
+      <div class="rc-value ${profitColor(pct)}">$${fmt2(profit)}</div>
+      <div class="rc-sub">/חודש</div>
+    </div>
+    <div class="result-card ${profitClass(pct)}">
+      <div class="rc-label">מרווח רווח</div>
+      <div class="rc-value ${profitColor(pct)}">${fmtPct(pct)}</div>
+      <div class="rc-sub">יעד 50%+</div>
+    </div>
+    <div class="result-card jade">
+      <div class="rc-label">הכנסה ממוצעת למטפל</div>
+      <div class="rc-value jade">$${fmt2(totalTherapists>0?totalRev/totalTherapists:0)}</div>
+      <div class="rc-sub">/חודש</div>
+    </div>
+  `;
+
+  document.getElementById('tbl4').innerHTML = `
+  <thead><tr><th>פריט</th><th>הכנסה</th><th>עלות API</th><th>רווח $</th></tr></thead>
+  <tbody>
+    <tr><td>בסיס Core (${totalTherapists} מטפלים)</td><td class="mono">$${fmt2(revBase)}</td><td class="mono amber">$${fmt2(costTok)}</td><td class="mono ${(revBase-costTok)>=0?'green':'red'}">$${fmt2(revBase-costTok)}</td></tr>
+    <tr><td>Tokens</td><td class="mono">$${fmt2(revTok)}</td><td class="mono">—</td><td class="mono green">$${fmt2(revTok)}</td></tr>
+    <tr><td>Supabase Platform</td><td class="mono">—</td><td class="mono amber">$${fmt2(costSupa)}</td><td class="mono red">-$${fmt2(costSupa)}</td></tr>
+    <tr><td>Audio (${nAudio} מטפלים)</td><td class="mono">$${fmt2(revAudio)}</td><td class="mono amber">$${fmt2(costAudio)}</td><td class="mono green">$${fmt2(revAudio-costAudio)}</td></tr>
+    <tr><td>Transcription (${nTrans} מטפלים)</td><td class="mono">$${fmt2(revTrans)}</td><td class="mono amber">$${fmt2(costTrans)}</td><td class="mono ${(revTrans-costTrans)>=0?'green':'red'}">$${fmt2(revTrans-costTrans)}</td></tr>
+    <tr style="font-weight:700;background:rgba(255,255,255,0.05);">
+      <td>סה"כ ${month}</td>
+      <td class="mono gold">$${fmt2(totalRev)}</td>
+      <td class="mono amber">$${fmt2(totalCost)}</td>
+      <td class="mono ${profit>=0?'green':'red'}">$${fmt2(profit)}</td>
+    </tr>
+  </tbody>`;
+
+  document.getElementById('breakeven4').innerHTML = `
+    <div class="flbl" style="margin-bottom:10px;">נקודת איזון ורווחיות</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;flex-wrap:wrap;">
+      <div><div class="rc-label">Supabase מכוסה על-ידי</div><div style="font-family:'Abril Fatface',serif;font-size:28px;color:var(--jade3);">${Math.ceil(costSupa/(totalTherapists>0?totalRev/totalTherapists:999))} מטפלים</div></div>
+      <div><div class="rc-label">להגיע ל-50% רווח צריך</div><div style="font-family:'Abril Fatface',serif;font-size:28px;color:var(--gold2);">${Math.ceil(totalCost*1.5/(totalTherapists>0?totalRev/totalTherapists:999))} מטפלים</div></div>
+      <div><div class="rc-label">רווח שנתי מוערך</div><div style="font-family:'Abril Fatface',serif;font-size:28px;color:${profit>=0?'var(--green2)':'var(--red)'};">$${fmt2(profit*12)}</div></div>
+    </div>
+    ${meterHTML(pct)}
+  `;
 }
 
-function rmExpense(i) {
-  S.expenses.splice(i,1);
-  renderAll(); calcAll();
+// ══════════════════════════════════════════
+//  TAB 5 — OFFER LETTER
+// ══════════════════════════════════════════
+let of_audio=false, of_trans=false;
+function toggleOfferAddon(type){
+  if(type==='audio'){of_audio=!of_audio; document.getElementById('oac_audio').classList.toggle('on',of_audio);}
+  if(type==='trans'){of_trans=!of_trans; document.getElementById('oac_trans').classList.toggle('on',of_trans);}
+  genOffer();
 }
 
-// ══ UTILS ══
-function fmt(n) { return Number(n||0).toLocaleString('he-IL'); }
-function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.className='toast'; t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 2200);
+function genOffer(){
+  const name  = document.getElementById('of_name').value||'ד״ר / מטפל/ת';
+  const size  = Math.max(1, parseInt(document.getElementById('of_size').value)||1);
+  const tier  = document.getElementById('of_tier').value;
+  const disc  = parseFloat(document.getElementById('of_disc').value)||0;
+  const trial = parseInt(document.getElementById('of_trial').value)||14;
+  const exp   = document.getElementById('of_exp').value||'—';
+
+  const tokPrices={s:9,p:25,u:42}, tierHeb={s:'Starter (5 מפגשים/יום)',p:'Pro (15 מפגשים/יום)',u:'Unlimited (ללא הגבלה)'};
+  const basePrc=18.90, audioPrc=8, transPrc=28;
+  const tokPrc = tokPrices[tier];
+  const fullPricePerHead = basePrc + tokPrc + (of_audio?audioPrc:0) + (of_trans?transPrc:0);
+  const discPricePerHead = fullPricePerHead * (1 - disc/100);
+  const totalContract = discPricePerHead * size;
+
+  const addons = [of_audio?'הקלטת מפגש 🎙️':'',of_trans?'תמלול עברית AI 📝':''].filter(Boolean);
+  const addonStr = addons.length ? `✅ ${addons.join('\n✅ ')}` : '';
+
+  const offerText = `שלום ${name},
+
+תודה על עניינך ב-MERIDIAN — העוזר הקליני לרפואה סינית.
+
+📋 הצעת מחיר מותאמת אישית — ${size > 1 ? `קבוצה של ${size} מטפלים` : 'מטפל יחיד'}
+
+🏷️ תוכנית: MERIDIAN ${tier==='s'?'Starter':tier==='p'?'Pro':'Unlimited'}
+📦 כולל:
+✅ MERIDIAN Core — 1,000 שאלות TCM + AI קליני
+✅ ${tierHeb[tier]}
+${addonStr}
+${disc > 0 ? `\n🎁 הנחת קבוצה: ${disc}%\n` : ''}
+💎 מחיר: $${discPricePerHead.toFixed(2)}/מטפל/חודש${size>1?`\n💎 סה"כ חוזה: $${totalContract.toFixed(2)}/חודש`:''}
+${disc > 0 ? `(מחיר מלא: $${fullPricePerHead.toFixed(2)}/מטפל — חסכת $${(fullPricePerHead-discPricePerHead).toFixed(2)})` : ''}
+
+🆓 ${trial} יום ניסיון חינם לכל מטפל
+🔒 ביטול בכל עת — ללא התחייבות
+📱 גישה מלאה מנייד ודסקטופ
+${exp !== '—' ? `⏰ הצעה בתוקף עד: ${exp}` : ''}
+
+לשאלות אני כאן — נשמח לקבל אתכם ל-MERIDIAN! ☯`;
+
+  document.getElementById('offerText').innerHTML = offerText.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  document.getElementById('offerText').setAttribute('data-plain', offerText);
+
+  // Profitability
+  const v = getVars();
+  const c = calcCosts(tier, of_audio, of_trans, v);
+  const profit = discPricePerHead - c.totalCost;
+  const pct = (profit/c.totalCost)*100;
+  document.getElementById('res5').innerHTML = `
+    <div class="result-card gold"><div class="rc-label">מחיר/מטפל</div><div class="rc-value gold">$${fmt2(discPricePerHead)}</div></div>
+    <div class="result-card"><div class="rc-label">עלות אמיתית</div><div class="rc-value amber">$${fmt2(c.totalCost)}</div></div>
+    <div class="result-card ${profitClass(pct)}"><div class="rc-label">רווח/מטפל</div><div class="rc-value ${profitColor(pct)}">$${fmt2(profit)}</div></div>
+    <div class="result-card ${profitClass(pct)}"><div class="rc-label">% רווח</div><div class="rc-value ${profitColor(pct)}">${fmtPct(pct)}</div></div>
+    ${size>1?`<div class="result-card gold"><div class="rc-label">ערך חוזה חודשי</div><div class="rc-value jade">$${fmt2(totalContract)}</div></div>`:''}
+    ${size>1?`<div class="result-card gold"><div class="rc-label">ערך חוזה שנתי</div><div class="rc-value jade">$${fmt2(totalContract*12)}</div></div>`:''}
+  `;
 }
-function printReport() { saveData(); window.print(); }
+
+function copyOffer(){
+  const text = document.getElementById('offerText').getAttribute('data-plain');
+  navigator.clipboard.writeText(text).then(()=>showToast('✅ הועתק לקליפבורד!')).catch(()=>{
+    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('✅ הועתק!');
+  });
+}
+function waOffer(){
+  const text = document.getElementById('offerText').getAttribute('data-plain');
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+
+// ══ UTILITIES ══
+function recalcAll(){ calc1(); calc2(); calc3(); calc4(); genOffer(); }
+function resetVars(){ Object.entries(DEFAULTS).forEach(([k,v])=>{ const el=document.getElementById(k); if(el) el.value=v; }); recalcAll(); }
+
+function saveToLocal(){
+  const data={};
+  Object.keys(DEFAULTS).forEach(k=>{ const el=document.getElementById(k); if(el) data[k]=el.value; });
+  data.prices={p1_base:V('p1_base'),p1_tok:V('p1_tok'),p1_audio:V('p1_audio'),p1_trans:V('p1_trans')};
+  localStorage.setItem('meridian_roi_vars', JSON.stringify(data));
+  showToast('💾 הגדרות נשמרו!');
+}
+
+function loadFromLocal(){
+  try {
+    const d = JSON.parse(localStorage.getItem('meridian_roi_vars')||'{}');
+    Object.entries(d).forEach(([k,v])=>{ if(k!=='prices'){ const el=document.getElementById(k); if(el) el.value=v; }});
+    if(d.prices){ Object.entries(d.prices).forEach(([k,v])=>{ const el=document.getElementById(k); if(el) el.value=v; }); }
+  } catch(e){}
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--jade);color:var(--gold2);padding:10px 24px;border-radius:9px;font-family:"Heebo",sans-serif;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,0.3);animation:fadeUp .3s ease;';
+  t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+}
+
+// ══ INIT ══
+window.addEventListener('load', ()=>{
+  loadFromLocal();
+  renderGroupList();
+  recalcAll();
+});
 </script>
 </body>
 </html>
